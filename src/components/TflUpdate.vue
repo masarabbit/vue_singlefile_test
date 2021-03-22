@@ -14,18 +14,12 @@
         <button v-on:click="sortTrainLines">
           Reverse Order
         </button>
-
-        <button 
-        v-if="!badservicehidden" 
-        v-on:click="hideBadService">
-          Hide Bad Service
-        </button>
-
-        <button 
-        v-else
-        v-on:click="showAllService">
-          Show All
-        </button>
+        
+        <GoodHideShowButton 
+          v-bind:bad-service-hidden = badServiceHidden 
+          v-bind:hide-bad-service = hideBadService
+          v-bind:show-all-service = showAllService
+        />
       </div>
   
     </header>
@@ -82,6 +76,7 @@
 
 <script>
 import axios from 'axios'
+import GoodHideShowButton  from './GoodHideShowButton'
 
 let storeData 
 
@@ -92,8 +87,11 @@ export default {
     return {
       message: 'Loading',
       trainlines: [],
-      badservicehidden: false
+      badServiceHidden: false
     }
+  },
+  components: {
+    GoodHideShowButton 
   },
   mounted () {
     axios
@@ -111,11 +109,11 @@ export default {
     hideBadService: function(){
       storeData = this.trainlines // note, this stores old info
       this.trainlines = this.trainlines.filter((trainline)=>trainline.lineStatuses[0].statusSeverityDescription === 'Good Service')
-      this.badservicehidden = true
+      this.badServiceHidden = true
     },
     showAllService: function(){
       this.trainlines = storeData
-      this.badservicehidden = false
+      this.badServiceHidden = false
     }
   },
   computed: {
