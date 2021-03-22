@@ -1,4 +1,4 @@
-# vuea_singlefile_test
+# vue_singlefile_test
 
 > A Vue.js project
 
