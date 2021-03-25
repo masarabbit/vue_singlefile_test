@@ -17,65 +17,51 @@
         
         <GoodHideShowButton 
           v-bind:bad-service-hidden = badServiceHidden 
-          v-bind:hide-bad-service = hideBadService
-          v-bind:show-all-service = showAllService
+          v-bind:hide-or-show-bad-service = hideOrShowBadService
         />
+          <!-- v-bind:show-all-service = showAllService -->
       </div>
-  
     </header>
 
-    <div class="wrapper flex_column">
+    <div 
+      class="wrapper flex_column" 
+      v-if="!badServiceHidden"
+    >
       <div 
-      class="card"
-      v-bind:key="trainline.linename"
-      v-for="trainline in trainlines"
+        class="card"
+        v-bind:key="trainline.linename"
+        v-for="trainline in trainlines"
       >
-        <p class="title" v-bind:class="trainline.id">
-          {{ trainline.name }}
-
-          <img class="emoji"
-          v-if="trainline.lineStatuses[0].statusSeverityDescription === 'Good Service'" 
-          src= '../assets/happy.svg'
-          />
-          <img class="emoji"
-          v-else-if="trainline.lineStatuses[0].statusSeverityDescription === 'Planned Closure'" 
-          src= '../assets/bit_sad.svg'
-          />
-          <img v-else class="emoji"
-          src= '../assets/sad.svg'
-          />
-        </p>
-
-        <div class="info">
-          <p 
-          class="status"
-          v-bind:class="trainline.lineStatuses[0].statusSeverityDescription.replace(' ','_').toLowerCase()"
-        >
-          {{ trainline.lineStatuses[0].statusSeverityDescription }}
-        </p>
-        <p
-          class="reason"
-          v-bind:class="trainline.lineStatuses[0].statusSeverityDescription"
-        >
-          {{ trainline.lineStatuses[0].reason ? 
-              trainline.lineStatuses[0].reason.split(':').slice(1).join(':') 
-              :
-              null
-          }}
-        </p>
-        </div>
+        <Emoji v-bind:trainline = trainline />
+        <UpdateInfo v-bind:trainline = trainline />
       </div>
     </div>
-  
+    
+    <!-- filtered view -->
+    <div 
+      class="wrapper flex_column" 
+      v-else
+    >
+      <div 
+        class="card"
+        v-bind:key="trainline.linename"
+        v-for="trainline in filteredTrainlines"
+      >
+        <Emoji v-bind:trainline = trainline />
+        <UpdateInfo v-bind:trainline = trainline />
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import GoodHideShowButton  from './GoodHideShowButton'
+import GoodHideShowButton from './GoodHideShowButton'
+import Emoji from './Emoji'
+import UpdateInfo from './UpdateInfo'
 
-let storeData 
-
+// let storeData 
 
 export default {
   name: 'update',
@@ -87,7 +73,9 @@ export default {
     }
   },
   components: {
-    GoodHideShowButton 
+    GoodHideShowButton,
+    Emoji,
+    UpdateInfo
   },
   mounted () {
     axios
@@ -100,45 +88,44 @@ export default {
   },
   methods: {
     sortTrainLines: function(){
-      // this.trainlines = this.trainlines.reverse()
       this.$store.dispatch('sortTrainLines', this.trainlines)
     },
-    hideBadService: function(){
-      storeData = this.trainlines // note, this stores old info
-      this.trainlines = this.trainlines.filter((trainline)=>trainline.lineStatuses[0].statusSeverityDescription === 'Good Service')
-      this.badServiceHidden = true
+    hideOrShowBadService: function(){
+      // storeData = this.trainlines // note, this stores old info
+      // this.trainlines = this.trainlines.filter((trainline)=>trainline.lineStatuses[0].statusSeverityDescription === 'Good Service')
+      this.badServiceHidden = !this.badServiceHidden
     },
-    showAllService: function(){
-      this.trainlines = storeData
-      this.badServiceHidden = false
-    }
+    // showAllService: function(){
+    //   this.trainlines = storeData
+    //   this.badServiceHidden = false
+    // }
   },
   computed: {
-      displayUpdateTime: function(){
-        const now = new Date()
-        const minutes = String(now.getMinutes()).length === 2 ?
-          now.getMinutes()
-          :
-          '0' + now.getMinutes()      
-        return `Last updated: ${now.getHours()}:${minutes} ${now.toDateString()}`
-      },
-        overallStatus: function() {
-        let goodServices = 0
-        this.trainlines.forEach(trainline=>{
-          if (trainline.lineStatuses[0].statusSeverityDescription === 'Good Service') goodServices++
-        })
-        return goodServices > 1 ?
-          `${goodServices} lines have Good Service`
-          :
-          `${goodServices} line have Good Service`
-      }
-
+    displayUpdateTime: function(){
+      const now = new Date()
+      const minutes = String(now.getMinutes()).length === 2 ?
+        now.getMinutes()
+        :
+        '0' + now.getMinutes()      
+      return `Last updated: ${now.getHours()}:${minutes} ${now.toDateString()}`
+    },
+    overallStatus: function(){
+      let goodServices = 0
+      this.trainlines.forEach(trainline=>{
+        if (trainline.lineStatuses[0].statusSeverityDescription === 'Good Service') goodServices++
+      })
+      return goodServices > 1 ?
+        `${goodServices} lines have Good Service`
+        :
+        `${goodServices} line have Good Service`
+    },
+    filteredTrainlines: function() {
+      return this.trainlines.filter((trainline)=>trainline.lineStatuses[0].statusSeverityDescription === 'Good Service')
+    }    
 }
 }
-
 
 </script>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 

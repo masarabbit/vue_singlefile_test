@@ -3,13 +3,13 @@
 <template>
   <button 
   v-if="!badServiceHidden" 
-  v-on:click="hideBadService">
+  v-on:click="hideOrShowBadService">
     Hide Bad Service
   </button>
 
   <button 
   v-else
-  v-on:click="showAllService">
+  v-on:click="hideOrShowBadService">
     Show All
   </button>
 </template>      
@@ -19,8 +19,9 @@
   export default {
     props: {
       badServiceHidden: Boolean,
-      hideBadService: Function,
-      showAllService: Function,
+      hideOrShowBadService: Function
+      // hideBadService: Function,
+      // showAllService: Function,
     }
 }
 </script>
