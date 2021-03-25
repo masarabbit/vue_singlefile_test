@@ -100,7 +100,8 @@ export default {
   },
   methods: {
     sortTrainLines: function(){
-      this.trainlines = this.trainlines.reverse()
+      // this.trainlines = this.trainlines.reverse()
+      this.$store.dispatch('sortTrainLines', this.trainlines)
     },
     hideBadService: function(){
       storeData = this.trainlines // note, this stores old info

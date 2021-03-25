@@ -12,10 +12,7 @@
   v-on:click="showAllService">
     Show All
   </button>
-
 </template>      
-
-
 
 
 <script>
@@ -25,8 +22,6 @@
       hideBadService: Function,
       showAllService: Function,
     }
-
-  
 }
 </script>
 
